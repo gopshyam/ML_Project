@@ -16,6 +16,7 @@ def searchTweets(keywords, since_date, to_date):
     for result in results:
         print result.text.encode('utf-8')
         print result.created_at
+        print dir(result)
 
 if __name__ == '__main__':
-    searchTweets(['Hitler'], '2016-11-06', '2016-11-10');
+    searchTweets(['Amazon'], '2016-11-06', '2016-11-10');
