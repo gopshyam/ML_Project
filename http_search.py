@@ -123,8 +123,8 @@ def get_oauth_parameters(consumer_key, access_token):
 
 
 method = "get"
-q = "Trump%2C%20OR%20Hitler%20lang%3Aen%20since%3A2016-11-01%20until%3A2016-11-02%20include%3Aretweets"
-url = "https://twitter.com/search"
+q = "Trump, OR Hitler lang:en since:2016-11-05 until:2016-11-06 include:retweets"
+url = "https://api.twitter.com/1.1/search/tweets.json"
 url_parameters = {
     'q': q,
     'src': 'typd',
@@ -146,6 +146,6 @@ headers = {'Authorization': create_auth_header(oauth_parameters)}
 
 url += '?' + urllib.urlencode(url_parameters)
 r = requests.get(url, headers=headers)
-print r.content
+print r.json()
 
-#parseHtml(r.text.encode('ascii', 'ignore'))
+parseHtml(r.text.encode('ascii', 'ignore'))
