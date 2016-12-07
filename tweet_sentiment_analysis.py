@@ -3,11 +3,14 @@ from nltk.sentiment.util import demo_tweets
 from nltk.tokenize import TweetTokenizer
 from nltk.corpus import stopwords
 from nltk import FreqDist
+import pickle
 
 tokenizer = TweetTokenizer()
 
 pos_tweet_file = "pos_tweets_list.txt"
 neg_tweet_file = "neg_tweets_list.txt"
+
+word_list = list()
 
 def tokenize_tweet(tweet):
     #Tokenizes the tweet and removes stopwords
@@ -37,7 +40,8 @@ def create_token_list():
     token_list += find_tokens(neg_tweet_file)
     return token_list
 
-def find_feature_for_tweet(tweet, word_list):
+def find_feature_for_tweet(tweet):
+    global word_list
     tokenized_tweet = tokenize_tweet(tweet)
     feature = dict()
     for token in tokenized_tweet:
@@ -48,11 +52,11 @@ def create_feature_list(word_list):
     feature_list = list()
     with open(pos_tweet_file, 'r') as f:
         for tweet in f:
-            feature_list.append([find_feature_for_tweet(tweet, word_list), 'positive'])
+            feature_list.append([find_feature_for_tweet(tweet), 'positive'])
 
     with open(neg_tweet_file, 'r') as f:
         for tweet in f:
-            feature_list.append([find_feature_for_tweet(tweet, word_list), 'negative'])
+            feature_list.append([find_feature_for_tweet(tweet), 'negative'])
 
     return feature_list
 
@@ -60,7 +64,10 @@ def create_feature_list(word_list):
 #Train the NaiveBayesClassifier
 def train_classifier(word_list):
     feature_list = create_feature_list(word_list)
-    print feature_list
+    classifier = NaiveBayesClassifier.train(feature_list)
+    class_f = open('naive_bayes_classifier', 'w+')
+    pickle.dump(classifier, class_f)
+    class_f.close()
 
 
 tweet_token_list = create_token_list()
