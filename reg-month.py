@@ -5,10 +5,13 @@ import os.path
 import json
 import pickle
 from tweet_sentiment_analysis import find_feature_for_tweet
+import sys
 
 #Find a running average of all the tweets for a particular month
 
-month = 6
+month = 7
+if (len(sys.argv) > 1):
+    month = int(sys.argv[1])
 
 #First extract the tar file
     #Then find all the days for which information is present
@@ -20,7 +23,7 @@ month = 6
 tar_file_path = 'data/archiveteam-twitter-stream-2016-0' + str(month) + "/"
 extracted_file_path = '2016/0' + str(month) + '/'
 classifier_file = "naive_bayes_classifier"
-output_file = "ebay_sent_dict"
+output_file = "sent_dict_" + str(month)
 classifier = None
 
 with open(classifier_file, 'r') as cf:
@@ -73,7 +76,7 @@ def parse_bz2(bz2_files):
                 tweet_line = json.loads(line)
                 #print tweet_line
                 if "text" in tweet_line.keys():
-                    if (tweet_line['lang'] == 'en' and 'ebay' in tweet_line["text"]): 
+                    if (tweet_line['lang'] == 'en'): 
                         tweet = tweet_line["text"].encode('UTF-8')
                         pos_sent, neg_sent = find_sentiment(tweet)
                         pos_sent_list.append(pos_sent)
@@ -87,7 +90,7 @@ def parse_bz2(bz2_files):
         counter += 1
     return sent_dict
 
-#extract_tar_file()    
+extract_tar_file()    
 bz2_files = get_files_by_extension(extracted_file_path, '.bz2')
 
 sent_dict = parse_bz2(bz2_files)

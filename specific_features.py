@@ -5,10 +5,22 @@ import os.path
 import json
 import pickle
 from tweet_sentiment_analysis import find_feature_for_tweet
+import sys
 
 #Find a running average of all the tweets for a particular month
 
 month = 6
+company = 'ebay'
+
+if (len(sys.argv) < 3):
+    exit()
+
+month = int(sys.argv[1])
+company = str(sys.argv[2])
+
+if (company == 'best'):
+    company = 'best buy'
+
 
 #First extract the tar file
     #Then find all the days for which information is present
@@ -20,7 +32,7 @@ month = 6
 tar_file_path = 'data/archiveteam-twitter-stream-2016-0' + str(month) + "/"
 extracted_file_path = '2016/0' + str(month) + '/'
 classifier_file = "naive_bayes_classifier"
-output_file = "ebay_sent_dict"
+output_file = company + "_sent_dict" + "_" + str(month)
 classifier = None
 
 with open(classifier_file, 'r') as cf:
@@ -69,17 +81,19 @@ def parse_bz2(bz2_files):
             #parse the json file to find the tweets
             pos_sent_list = list()
             neg_sent_list = list()
-            for line in jf:
-                tweet_line = json.loads(line)
-                #print tweet_line
-                if "text" in tweet_line.keys():
-                    if (tweet_line['lang'] == 'en' and 'ebay' in tweet_line["text"]): 
-                        tweet = tweet_line["text"].encode('UTF-8')
-                        pos_sent, neg_sent = find_sentiment(tweet)
-                        pos_sent_list.append(pos_sent)
-                        neg_sent_list.append(neg_sent)
-            sent_dict[date][0] += pos_sent_list
-            sent_dict[date][1] += neg_sent_list
+            try:
+                for line in jf:
+                    tweet_line = json.loads(line)
+                    if "text" in tweet_line.keys():
+                        if (tweet_line['lang'] == 'en' and company in tweet_line["text"].lower()):
+                            tweet = tweet_line["text"].encode('UTF-8')
+                            pos_sent, neg_sent = find_sentiment(tweet)
+                            pos_sent_list.append(pos_sent)
+                            neg_sent_list.append(neg_sent)
+                sent_dict[date][0] += pos_sent_list
+                sent_dict[date][1] += neg_sent_list
+            except Exception:
+                continue
         os.system("rm " + json_file)
         with open(output_file, 'w+') as of:
             pickle.dump(sent_dict, of)
